@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Countdown bis zum 30. August</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg1:#0f1226;
+      --bg2:#1a1f47;
+      --accent:#7c9cff;
+      --accent-2:#9f7cff;
+      --glass:rgba(255,255,255,.08);
+      --text:#e9ecff;
+      --muted:#b7c0ea;
+      --success:#6ce5b1;
+      --shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+      --radius: 16px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg1:#eef2ff; --bg2:#dae1ff;
+        --glass:rgba(255,255,255,.65);
+        --text:#121429; --muted:#3a3f66;
+        --shadow: 0 10px 30px rgba(20,30,80,.15), inset 0 1px 0 rgba(255,255,255,.9);
+      }
+    }
+
+    /* Background */
+    body{
+      margin:0;
+      min-height:100svh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(124,156,255,.28), transparent 60%),
+        radial-gradient(1000px 700px at 85% 90%, rgba(159,124,255,.25), transparent 60%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      display:grid;
+      place-items:center;
+      padding:28px;
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      display:grid;
+      gap:22px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:700; letter-spacing:.3px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:10px;
+      background: conic-gradient(from 210deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+    }
+
+    .card{
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    h1{
+      margin:0 0 6px;
+      font-size: clamp(26px, 3.5vw, 42px);
+      line-height:1.15;
+    }
+    p.lead{
+      margin:0; color:var(--muted);
+      font-size: clamp(14px, 1.5vw, 16px);
+    }
+
+    /* Countdown grid */
+    .timer{
+      display:grid; gap:16px;
+      grid-template-columns: repeat(4, minmax(110px, 1fr));
+      padding:22px;
+    }
+    @media (max-width:560px){
+      .timer{ grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .unit{
+      display:grid; gap:10px; text-align:center;
+    }
+    .label{ color:var(--muted); font-size:14px; letter-spacing:.4px; }
+
+    /* Flip-style digits */
+    .digit{
+      position:relative;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      background:
+        radial-gradient(140% 100% at 20% 0%, rgba(255,255,255,.14), transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+      padding:0; height:120px; display:grid; place-items:center;
+    }
+    .value{
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(42px, 6vw, 56px);
+      font-weight:800;
+      letter-spacing:.5px;
+      transform: translateZ(0);
+      will-change: contents;
+    }
+    .digit.anim{
+      animation: pop .5s ease;
+    }
+    @keyframes pop{
+      0%{ transform: scale(.98); }
+      55%{ transform: scale(1.015); }
+      100%{ transform: scale(1); }
+    }
+
+    /* Controls */
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      padding:16px 18px;
+    }
+    .controls .group{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .controls input, .controls button{
+      border-radius:12px; border:1px solid rgba(0,0,0,.08);
+      background:var(--glass);
+      color:var(--text);
+      padding:10px 12px;
+      font-size:14px;
+      outline:none;
+      box-shadow: var(--shadow);
+    }
+    .controls input{ backdrop-filter: blur(8px); }
+    .controls button{
+      cursor:pointer; font-weight:700;
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      border:none; color:white;
+    }
+    .controls button.secondary{
+      background:transparent; color:var(--text);
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    footer{
+      text-align:center; color:var(--muted); font-size:12px; padding:10px 0 0;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      font-size:12px; color:var(--muted);
+    }
+
+    /* Confetti (simple) */
+    .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
+    .piece{
+      position:absolute; width:10px; height:16px; opacity:0; transform:translateY(-20px) rotate(0deg);
+      animation: fall 2.8s ease-in forwards;
+    }
+    @keyframes fall{
+      5%{ opacity:1; }
+      100%{ transform: translateY(110vh) rotate(540deg); opacity:0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="pill" title="Deine lokale Zeitzone">
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm1 10.268V6a1 1 0 1 0-2 0v6.732a2 2 0 1 0 2 0z"/></svg>
+            <span id="tz"></span>
+          </div>
+          <h1>Countdown bis zum <span id="targetLabel">30. August 2025, 00:00</span></h1>
+          <p class="lead">Die Zeit läuft – passe das Datum unten an, wenn du möchtest.</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="card timer" aria-live="polite" aria-atomic="true">
+      <div class="unit">
+        <div class="digit"><div class="value" id="days">—</div></div>
+        <div class="label">Tage</div>
+      </div>
+      <div class="unit">
+        <div class="digit"><div class="value" id="hours">—</div></div>
+        <div class="label">Stunden</div>
+      </div>
+      <div class="unit">
+        <div class="digit"><div class="value" id="minutes">—</div></div>
+        <div class="label">Minuten</div>
+      </div>
+      <div class="unit">
+        <div class="digit"><div class="value" id="seconds">—</div></div>
+        <div class="label">Sekunden</div>
+      </div>
+    </section>
+
+    <section class="card controls">
+      <div class="group" role="group" aria-label="Zieldatum setzen">
+        <label for="date">Datum</label>
+        <input type="date" id="date" />
+        <label for="time">Uhrzeit</label>
+        <input type="time" id="time" step="60" />
+        <button id="apply">Übernehmen</button>
+        <button id="reset" class="secondary" title="Auf 30. August zurücksetzen">Zurücksetzen</button>
+      </div>
+      <div class="group">
+        <span class="pill">Ziel: <strong id="targetPretty">–</strong></span>
+      </div>
+    </section>
+
+    <footer>
+      <small>Funktioniert komplett offline. Fortschritt wird lokal gespeichert.</small>
+    </footer>
+  </div>
+
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <script>
+    // ---------- Hilfsfunktionen ----------
+    const pad = (n)=> String(n).padStart(2,'0');
+    const $ = (id)=> document.getElementById(id);
+
+    // Lokale Zeitzone anzeigen
+    try{
+      const tz = Intl.DateTimeFormat(undefined, { timeZoneName:'short' }).format(new Date()).split(' ').pop();
+      $('tz').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone + ' (' + tz + ')';
+    }catch{ $('tz').textContent = 'Lokale Zeit'; }
+
+    // Standard: 30. August 2025, 00:00 lokale Zeit
+    const defaultTarget = new Date(2025, 7, 30, 0, 0, 0); // Monat 7 = August
+    const STORAGE_KEY = 'pretty-countdown-target';
+
+    function loadTarget(){
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if(saved){
+        const t = new Date(saved);
+        if(!isNaN(t)) return t;
+      }
+      return defaultTarget;
+    }
+
+    function saveTarget(date){
+      localStorage.setItem(STORAGE_KEY, date.toISOString());
+    }
+
+    function formatTarget(d){
+      const fmt = new Intl.DateTimeFormat('de-DE', {
+        weekday:'long', year:'numeric', month:'long', day:'numeric',
+        hour:'2-digit', minute:'2-digit'
+      });
+      return fmt.format(d);
+    }
+
+    function setInputsFromDate(d){
+      const y = d.getFullYear();
+      const m = pad(d.getMonth()+1);
+      const day = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const mm = pad(d.getMinutes());
+      $('date').value = `${y}-${m}-${day}`;
+      $('time').value = `${hh}:${mm}`;
+    }
+
+    // Einfaches Konfetti wenn Countdown bei 0
+    function popConfetti(){
+      const host = $('confetti');
+      host.innerHTML = '';
+      const pieces = 80;
+      for(let i=0;i<pieces;i++){
+        const el = document.createElement('div');
+        el.className='piece';
+        el.style.left = Math.random()*100 + 'vw';
+        el.style.background = `linear-gradient(180deg, hsl(${Math.random()*360},90%,70%), hsl(${Math.random()*360},90%,55%))`;
+        el.style.animationDelay = (Math.random()*0.8)+'s';
+        el.style.transform = `translateY(-20px) rotate(${Math.random()*180}deg)`;
+        host.appendChild(el);
+      }
+      setTimeout(()=> host.innerHTML='', 4000);
+    }
+
+    // ---------- Countdown-Logik ----------
+    let target = loadTarget();
+    setInputsFromDate(target);
+    $('targetLabel').textContent = `${target.getDate()}. ${target.toLocaleString('de-DE', { month:'long' })} ${target.getFullYear()}, ${pad(target.getHours())}:${pad(target.getMinutes())}`;
+    $('targetPretty').textContent = formatTarget(target);
+
+    let last = { d:null, h:null, m:null, s:null };
+    let reached = false;
+
+    function tick(){
+      const now = new Date();
+      let diff = target - now;
+
+      if(diff <= 0){
+        // Ziel erreicht
+        $('days').textContent = '00';
+        $('hours').textContent = '00';
+        $('minutes').textContent = '00';
+        $('seconds').textContent = '00';
+        if(!reached){
+          reached = true;
+          popConfetti();
+          document.title = '🎉 Ziel erreicht!';
+        }
+        return;
+      } else if(reached){
+        reached = false;
+        document.title = 'Countdown läuft …';
+      }
+
+      const sec = Math.floor(diff/1000) % 60;
+      const min = Math.floor(diff/1000/60) % 60;
+      const hr  = Math.floor(diff/1000/60/60) % 24;
+      const day = Math.floor(diff/1000/60/60/24);
+
+      const d = pad(day), h = pad(hr), m = pad(min), s = pad(sec);
+
+      // nur animieren, wenn sich die Zahl ändert
+      const update = (id, val, key) => {
+        const el = $(id);
+        if(last[key] !== val){
+          el.textContent = val;
+          el.parentElement.classList.remove('anim');
+          // next frame to restart animation
+          requestAnimationFrame(()=> el.parentElement.classList.add('anim'));
+          last[key] = val;
+        }
+      };
+
+      update('days', d, 'd');
+      update('hours', h, 'h');
+      update('minutes', m, 'm');
+      update('seconds', s, 's');
+    }
+
+    // alle 250ms ticken, um saubere Sekundenwechsel zu erwischen (leicht gedrosselt)
+    tick();
+    setInterval(tick, 250);
+
+    // ---------- UI-Interaktionen ----------
+    $('apply').addEventListener('click', ()=>{
+      const date = $('date').value;
+      const time = $('time').value || '00:00';
+      if(!date){
+        alert('Bitte ein Datum auswählen.');
+        return;
+      }
+      const [yyyy, mm, dd] = date.split('-').map(Number);
+      const [HH, MM] = time.split(':').map(Number);
+      const next = new Date(yyyy, (mm-1), dd, HH, MM, 0);
+      if(isNaN(next)){
+        alert('Ungültiges Datum/Uhrzeit.');
+        return;
+      }
+      target = next;
+      saveTarget(target);
+      $('targetLabel').textContent = `${target.getDate()}. ${target.toLocaleString('de-DE', { month:'long' })} ${target.getFullYear()}, ${pad(target.getHours())}:${pad(target.getMinutes())}`;
+      $('targetPretty').textContent = formatTarget(target);
+      document.title = 'Countdown läuft …';
+      tick();
+    });
+
+    $('reset').addEventListener('click', ()=>{
+      target = defaultTarget;
+      saveTarget(target);
+      setInputsFromDate(target);
+      $('targetLabel').textContent = `${target.getDate()}. ${target.toLocaleString('de-DE', { month:'long' })} ${target.getFullYear()}, ${pad(target.getHours())}:${pad(target.getMinutes())}`;
+      $('targetPretty').textContent = formatTarget(target);
+      document.title = 'Countdown bis zum 30. August';
+      tick();
+    });
+
+    // Titel initial setzen
+    document.title = 'Countdown läuft …';
+  </script>
+</body>
+</html>
